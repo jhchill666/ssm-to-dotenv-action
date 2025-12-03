@@ -32,7 +32,9 @@ async function runAction() {
         return `${key}=${value}`;
       });
 
-      const outputPath = resolve(process.cwd(), output);
+      // Use GITHUB_WORKSPACE if available (standard GitHub Actions workspace), otherwise fall back to cwd
+      const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
+      const outputPath = resolve(workspace, output);
       core.info(`Writing to file: ${outputPath} (resolved from: ${output})`);
 
       try {
