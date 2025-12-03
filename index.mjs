@@ -38,6 +38,7 @@ async function runAction() {
       try {
         await writeFile(outputPath, envs.join("\n"));
         core.info(`Successfully wrote file to: ${outputPath}`);
+        core.setOutput("file-path", outputPath);
       } catch (writeError) {
         core.error(`Failed to write file: ${writeError.message}`);
         throw writeError;
