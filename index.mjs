@@ -1,7 +1,7 @@
 import core from "@actions/core";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { writeFile, access } from "node:fs/promises";
-import { resolve } from "node:path";
+import { writeFile, access, stat } from "node:fs/promises";
+import { resolve, relative } from "node:path";
 
 async function runAction() {
   try {
@@ -35,22 +35,32 @@ async function runAction() {
       // Use GITHUB_WORKSPACE if available (standard GitHub Actions workspace), otherwise fall back to cwd
       const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
       const outputPath = resolve(workspace, output);
+      const relativePath = relative(workspace, outputPath);
+
+      core.info(`Workspace: ${workspace}`);
       core.info(`Writing to file: ${outputPath} (resolved from: ${output})`);
+      core.info(`Relative path from workspace: ${relativePath}`);
 
       try {
-        await writeFile(outputPath, envs.join("\n"));
+        await writeFile(outputPath, envs.join("\n"), { mode: 0o644 });
 
-        // Verify the file was written
+        // Verify the file was written and get its stats
         try {
           await access(outputPath);
+          const stats = await stat(outputPath);
           core.info(`Successfully wrote and verified file: ${outputPath}`);
+          core.info(
+            `File size: ${stats.size} bytes, mode: ${stats.mode.toString(8)}`
+          );
         } catch (accessError) {
           core.warning(
             `File written but cannot be accessed: ${accessError.message}`
           );
         }
 
+        // Output both absolute and relative paths
         core.setOutput("file-path", outputPath);
+        core.setOutput("file-path-relative", relativePath);
       } catch (writeError) {
         core.error(`Failed to write file: ${writeError.message}`);
         throw writeError;
