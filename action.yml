@@ -19,12 +19,6 @@ inputs:
     default: eu-west-2
     required: false
 
-outputs:
-  file-path:
-    description: The absolute path to the created .env file
-  file-path-relative:
-    description: The relative path to the created .env file from the workspace
-
 runs:
   using: node20
   main: index.mjs
