@@ -7,8 +7,8 @@ async function runAction() {
     const ssmPath = core.getInput("ssm-path", { required: true });
     const output = core.getInput("output") ?? ".env";
 
-    const decryption = core.getInput("decryption") === "false";
-    const region = core.getInput("decryption") === "false";
+    const decryption = core.getInput("decryption") !== "false";
+    const region = core.getInput("aws-region") || "eu-west-2";
 
     const client = new SSMClient({ region: region });
 
