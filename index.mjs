@@ -1,7 +1,7 @@
-import { writeFileSync } from "node:fs";
 import core from "@actions/core";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 import { writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 async function runAction() {
   try {
@@ -32,9 +32,16 @@ async function runAction() {
         return `${key}=${value}`;
       });
 
-      core.info(`Writing to file: ${output}`);
+      const outputPath = resolve(process.cwd(), output);
+      core.info(`Writing to file: ${outputPath} (resolved from: ${output})`);
 
-      await writeFile(output, envs.join("\n"));
+      try {
+        await writeFile(outputPath, envs.join("\n"));
+        core.info(`Successfully wrote file to: ${outputPath}`);
+      } catch (writeError) {
+        core.error(`Failed to write file: ${writeError.message}`);
+        throw writeError;
+      }
 
       core.info(`Environments exported: ${envs.join("\n")}`);
     } else {
