@@ -1,0 +1,18 @@
+{
+  "name": "ssm-to-dotenv-action",
+  "version": "1.0.0",
+  "description": "Load an AWS SSM Json parameter and create .env file",
+  "type": "module",
+  "main": "index.mjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhchill666/ssm-to-dotenv-action.git"
+  },
+  "license": "ISC",
+  "author": "Jamie Hill",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@aws-sdk/client-ssm": "^3.943.0"
+  },
+  "packageManager": "yarn@4.12.0"
+}

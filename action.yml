@@ -1,0 +1,24 @@
+name: 🔐 SSM to Dotenv
+description: >
+  Converts SSM parameters to a .env file
+
+inputs:
+  ssm-path:
+    description: SSM path to load parameters from
+    required: true
+  output:
+    description: Output filename
+    default: ".env"
+    required: false
+  decryption:
+    description: Whether to decrypt the parameter
+    default: "false"
+    required: false
+  aws-region:
+    description: AWS region for SSM
+    default: eu-west-2
+    required: false
+
+runs:
+  using: node20
+  main: ssmToDotenv.mjs
