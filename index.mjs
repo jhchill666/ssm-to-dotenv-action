@@ -12,6 +12,7 @@ async function runAction() {
 
     const client = new SSMClient({ region: region });
 
+    core.info(`Loading: ${ssmPath}`);
     const command = new GetParameterCommand({
       Name: ssmPath,
       WithDecryption: decryption,
@@ -19,6 +20,8 @@ async function runAction() {
 
     const response = await client.send(command);
     const parsedValue = parseValue(response.Parameter.Value);
+
+    core.info(`Loaded: ${JSON.stringify(parsedValue)}`);
 
     if (typeof parsedValue === "object") {
       core.debug(`parsedValue: ${JSON.stringify(parsedValue)}`);
@@ -28,7 +31,12 @@ async function runAction() {
         return `${key}=${value}`;
       });
 
+      core.info(`Writing to file: ${output}`);
+
       writeFileSync(output, envs.join("\n"));
+
+      core.info(`Written to file: ${output}`);
+      core.info(`Environments exported: ${envs.join("\n")}`);
     } else {
       core.error(`Value not json: ${parsedValue}`);
     }
@@ -41,7 +49,7 @@ function parseValue(val) {
   try {
     return JSON.parse(val);
   } catch {
-    core.debug(
+    core.info(
       "JSON parse failed - assuming parameter is to be taken as a string literal"
     );
     return val;
