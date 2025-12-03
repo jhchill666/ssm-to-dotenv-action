@@ -1,6 +1,6 @@
 import core from "@actions/core";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { writeFile } from "node:fs/promises";
+import { writeFile, access } from "node:fs/promises";
 import { resolve } from "node:path";
 
 async function runAction() {
@@ -39,7 +39,17 @@ async function runAction() {
 
       try {
         await writeFile(outputPath, envs.join("\n"));
-        core.info(`Successfully wrote file to: ${outputPath}`);
+
+        // Verify the file was written
+        try {
+          await access(outputPath);
+          core.info(`Successfully wrote and verified file: ${outputPath}`);
+        } catch (accessError) {
+          core.warning(
+            `File written but cannot be accessed: ${accessError.message}`
+          );
+        }
+
         core.setOutput("file-path", outputPath);
       } catch (writeError) {
         core.error(`Failed to write file: ${writeError.message}`);
