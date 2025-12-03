@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import core from "@actions/core";
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
+import { writeFile } from "node:fs/promises";
 
 async function runAction() {
   try {
@@ -33,9 +34,8 @@ async function runAction() {
 
       core.info(`Writing to file: ${output}`);
 
-      writeFileSync(output, envs.join("\n"));
+      await writeFile(output, envs.join("\n"));
 
-      core.info(`Written to file: ${output}`);
       core.info(`Environments exported: ${envs.join("\n")}`);
     } else {
       core.error(`Value not json: ${parsedValue}`);
